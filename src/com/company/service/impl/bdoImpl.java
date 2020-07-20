@@ -1,11 +1,9 @@
 package com.company.service.impl;
-
 import com.company.repo.databaseConnection;
 import com.company.service.bdo;
 import com.company.utils.validator;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.sun.xml.internal.bind.v2.model.core.NonElement;
-
 import javax.xml.transform.Result;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,46 +21,59 @@ import java.util.regex.Pattern;
 public class bdoImpl {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
     databaseConnection db = new databaseConnection();
-    Connection con = db.getConnection();
     validator vl = new validator();
     Scanner sc = new Scanner(System.in);
     int UID;
 
     public void bdoOption() throws SQLException, ParseException, IOException {
-        System.out.print("Choose your option \n 1.Create Gpm \n 2.Update Gpm \n 3.Delete Gpm \n 4.Create Project \n 5.Update Project \n 6.Delete Project\n");
-        int i=sc.nextInt();
-        switch(i)
-        {
-            case 1:
-                createGpm();
-                break;
-            case 2:
-                updateGpm();
-                break;
-            case 3:
-                deleteGpm();
-                break;
-            case 4:
-                createProject();
-                break;
-            case 5:
-                updateProject();
-                break;
-            case 6:
-                deleteProject();
-                break;
-            default:
-                System.out.println("Default ");
+        try {
+            Connection con = db.getConnection();
+            Statement stmt = con.createStatement();
+            System.out.print("Choose your option \n 1.Create Gpm \n 2.Update Gpm \n " +
+                    "3.Delete Gpm \n 4.Create Project \n 5.Update Project \n 6.Delete Project\n" +
+                    "7.Show all the GPM \n 8.Show all the Member\n 9. Notifications \n 10. Exit\n");
+            int i = sc.nextInt();
+            while (i <= 10) {
+                if (i == 1)
+                    createGpm();
+                else if (i == 2)
+                    updateGpm();
+                else if (i == 3)
+                    deleteGpm();
+                else if (i == 4)
+                    createProject();
+                else if (i == 5)
+                    updateProject();
+                else if (i == 6)
+                    deleteProject();
+                else if( i==7)
+                    vl.listOfGpm(stmt);
+                else if (i == 8)
+                    vl.showMember();
+                else if (i ==9)
+                    notification();
+                else if(i == 10) {
+                    System.out.println("\t****Thanks for using 'Mahatma Gandhi National Rural Employment Act' system**** ");
+                    break;
+                }
+                System.out.print("Choose your option \n 1.Create Gpm \n 2.Update Gpm \n " +
+                        "3.Delete Gpm \n 4.Create Project \n 5.Update Project \n 6.Delete Project\n" +
+                        "7.Show all the GPM \n 8.Show all the Member\n 9. Notifications \n 10. Exit\n");                i = sc.nextInt();
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
         }
 
     }
 
     public void viewComplaints() throws SQLException {
         try {
+            Connection con = db.getConnection();
             Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("select * from report");
+            ResultSet rs = stmt.executeQuery("\"select member.email, member.name, report.issue from member INNER JOIN report ON member.mId = report.mId");
             while (rs.next())
-                System.out.print(rs.getString(1) + "  " + rs.getString(2) + "  " + rs.getString(3));
+                System.out.print("Member Email:"+rs.getString(1) + "  \n" + "Member Name: "+rs.getString(2) + " \n " + "Issue: "+rs.getString(3)+"\n");
 //                System.out.println(rs.getString(2)+" "+rs.getString(3)+"  "+rs.getInt(4)+" "+rs.getFloat(5)+"  "+rs.getDate(6)+"  "+rs.getDate(7)+"   "+rs.getString(8));
             con.close();
         } catch (Exception e) {
@@ -72,6 +83,7 @@ public class bdoImpl {
 
     public void bdoLogin() throws SQLException {
         try {
+            Connection con = db.getConnection();
             Statement stmt = con.createStatement();
             System.out.print("Enter your EmailId: ");
             String Email = sc.nextLine();
@@ -82,6 +94,8 @@ public class bdoImpl {
                 if (rs.next()) {
                     int BdoId = rs.getInt(1);
                     this.UID = BdoId;
+                    con.close();
+                    stmt.close();
                     System.out.print("****** WELCOME TO BDO MANAGEMENT ******");
                     bdoOption();
                 } else
@@ -95,10 +109,11 @@ public class bdoImpl {
 
     public void createGpm() throws SQLException {
         try {
+            Connection con = db.getConnection();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
             Statement stmt = con.createStatement();
             int BdoId = this.UID;
-            char is_deleted = 'T';
+            char is_deleted = 'F';
             System.out.print("Create new GPM:  \n ");
             System.out.print("Enter Name: ");
             String name = bufferedReader.readLine();
@@ -111,12 +126,18 @@ public class bdoImpl {
             System.out.print("Enter EmailId: ");
             String email = bufferedReader.readLine();
             if (vl.isValid(email)) {
-                System.out.print("Enter Password: ");
-                String password = bufferedReader.readLine();
-                stmt.executeUpdate("Insert into gpm(email,name,age,address,bdoId,pin,password,created_at,is_deleted)values ('" + email + "'','" + name + "','" + age + "','" + address + "','" + BdoId + "','" + pin + "','" + password + "',CURRENT_TIMESTAMP,'"+is_deleted+"')");
-                con.close();
+                ResultSet rs = stmt.executeQuery("select * from gpm where email = '" + email + "'");
+                if (rs.next()) {
+                    System.out.println("Already user Present!!!");
+                } else {
+                    System.out.print("Enter Password: ");
+                    String password = bufferedReader.readLine();
+                    stmt.executeUpdate("Insert into gpm(email,name,age,address,bdoId,pin,password,created_at,is_deleted)values ('" + email + "','" + name + "','" + age + "','" + address + "','" + BdoId + "','" + pin + "','" + password + "',CURRENT_TIMESTAMP,'" + is_deleted + "')");
+                    System.out.println("Gpm is created!!!");
+                }
             } else
                 System.out.print("Invalid EmailId! ");
+            con.close();
         } catch (Exception e) {
             System.out.print(e);
         }
@@ -126,10 +147,10 @@ public class bdoImpl {
 
     public void updateGpm() throws SQLException {
         try {
+            Connection con = db.getConnection();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-            vl.listOfGpm();
             Statement stmt = con.createStatement();
-            LocalDateTime updated_at = LocalDateTime.now();
+            vl.listOfGpm(stmt);
             System.out.print("Enter EmailId of GPM: ");
             String email = bufferedReader.readLine();
             if (vl.isValid(email)) {
@@ -145,25 +166,26 @@ public class bdoImpl {
                     if (ch == 1) {
                         System.out.print("Please update your Name: ");
                         String name = bufferedReader.readLine();
-                        stmt.executeUpdate("Update gpm set name ='" + name + "' ,updated_at=CURRENT_TIMESTAMP where email = '" + email + "'");
-                        con.close();
-                    }if (ch == 2) {
+                        stmt.execute("Update gpm set name ='" + name + "' ,updated_at=CURRENT_TIMESTAMP where email = '" + email + "'");
+                        System.out.println("Updated!!!");
+                    } else if (ch == 2) {
                         System.out.print("Please update your Address: ");
                         String address = sc.nextLine();
                         stmt.executeUpdate("Update gpm set name ='" + address + "' ,updated_at=CURRENT_TIMESTAMP where email = '" + email + "'");
-                        con.close();
-                    }if (ch == 3) {
+                        System.out.println("Updated!!!");
+                    } else if (ch == 3) {
                         System.out.print("Update your Pincode: ");
                         int pincode = sc.nextInt();
                         stmt.executeUpdate("Update gpm set name ='" + pincode + "' ,updated_at=CURRENT_TIMESTAMP where email = '" + email + "'");
-                        con.close();
-                    }if (ch == 4) {
+                        System.out.println("Updated!!!");
+                    } else if (ch == 4) {
                         System.out.print("Update your Password:");
                         String password = sc.nextLine();
                         stmt.executeUpdate("Update gpm set name ='" + password + "' ,updated_at=CURRENT_TIMESTAMP where email = '" + email + "'");
-                        con.close();
-                    }if (ch > 4)
+                        System.out.println("Updated!!!");
+                    } else if (ch > 4)
                         System.out.print("Invalid Choice");
+                    con.close();
                 } else
                     System.out.print("this email is not present");
             } else
@@ -175,16 +197,17 @@ public class bdoImpl {
 
     public void deleteGpm() throws SQLException {
         try {
-            vl.listOfGpm();
+            Connection con = db.getConnection();
             Statement stmt = con.createStatement();
+            vl.listOfGpm(stmt);
             System.out.print("Enter EmailId to delete the user: ");
             String email = sc.nextLine();
             if (vl.isValid(email)) {
-                stmt.executeUpdate("update gpm set is_deleted = 'F' where email = '"+email+"'");
-                con.close();
+                stmt.executeUpdate("update gpm set is_deleted = 'T' where email = '" + email + "'");
                 System.out.print("User is Deleted!!!");
             } else
                 System.out.print("Email is Invalid!!");
+            con.close();
         } catch (Exception e) {
             System.out.print(e);
         }
@@ -192,6 +215,7 @@ public class bdoImpl {
 
     public void createProject() throws SQLException, ParseException {
         try {
+            Connection con = db.getConnection();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
             Statement stmt = con.createStatement();
             System.out.print("Create your Project :\n");
@@ -204,7 +228,7 @@ public class bdoImpl {
             if (ch == 2)
                 projectType = "Sewage Treatment";
             if (ch == 3)
-                projectType = "Builduing Construction";
+                projectType = "Building Construction";
             if (ch > 3)
                 System.out.print("Invalid choice!!!");
             System.out.print("Project Name:");
@@ -223,11 +247,11 @@ public class bdoImpl {
             String date2 = sc.next();
             java.util.Date myDate1 = new java.util.Date(date2);
             java.sql.Date sqlDate1 = new java.sql.Date(myDate1.getTime());
-            char is_deleted = 'T';
+            char is_deleted = 'F';
             stmt.executeUpdate("Insert into project(projectName,address,totalMembers,costEstimated,startDate,endDate,projectType,created_at,is_deleted)" +
                     "values('" + projectName + "','" + address + "','" + totalMember + "','" + cost + "','" + sqlDate + "','" + sqlDate1 + "','" + projectType + "',CURRENT_TIMESTAMP,'" + is_deleted + "')");
-            con.close();
             System.out.print("Project is created.!!!");
+            con.close();
         } catch (Exception e) {
             System.out.print(e);
         }
@@ -235,12 +259,13 @@ public class bdoImpl {
 
     public void updateProject() throws SQLException, IOException {
         try {
+            Connection con = db.getConnection();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
             Statement stmt = con.createStatement();
-            vl.listOfProjects();
+            vl.listOfProjects(stmt);
             System.out.println("Project name: ");
             String projectName = bufferedReader.readLine();
-            ResultSet rs = stmt.executeQuery("Select * from project where is_deleted = 'T' and projectName='" + projectName + "' ");
+            ResultSet rs = stmt.executeQuery("Select * from project where is_deleted = 'F' and projectName='" + projectName + "' ");
             if (rs.next()) {
                 System.out.println("1.Project Name: " + rs.getString(2));
                 System.out.println("2.Address: " + rs.getString(3));
@@ -255,44 +280,129 @@ public class bdoImpl {
                     System.out.print("Please update your Total Member of the Project : ");
                     int totalMmebers = sc.nextInt();
                     stmt.executeUpdate("Update project set totalMembers ='" + totalMmebers + "',updated_at=CURRENT_TIMESTAMP where projectName = '" + projectName + "'");
-                    con.close();
-                }
-                if (ch == 2) {
+                    System.out.println("Updated!");
+                } else if (ch == 2) {
                     System.out.println("Please update your Cost Estimation of the project: ");
                     float cost = sc.nextFloat();
                     stmt.executeUpdate("Update project set totalMembers ='" + cost + "',updated_at=CURRENT_TIMESTAMP where projectName = '" + projectName + "'");
-                }
-                if (ch > 2) {
+                    System.out.println("Updated!");
+                } else if (ch > 2) {
                     System.out.println("Invalid Choice");
                 }
 
             } else
                 System.out.println("Project is not present!!!");
-
-        }
-        catch (Exception e){
+            con.close();
+        } catch (Exception e) {
             System.out.println(e);
         }
     }
 
     public void deleteProject() throws SQLException, IOException {
         try {
+            Connection con = db.getConnection();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-            vl.listOfProjects();
             Statement stmt = con.createStatement();
+            vl.listOfProjects(stmt);
             System.out.print("Enter Project Name to delete it: ");
             System.out.println("Project name: ");
             String projectName = bufferedReader.readLine();
-            ResultSet rs = stmt.executeQuery("Select * from project where is_deleted = 'T' and projectName='" + projectName + "' ");
+            ResultSet rs = stmt.executeQuery("Select * from project where is_deleted = 'F' and projectName='" + projectName + "' ");
             if (rs.next()) {
-                stmt.executeUpdate("update project set is_deleted= 'F' where projectName = '"+projectName+"'");
-                con.close();
+                stmt.executeUpdate("update project set is_deleted= 'T' where projectName = '" + projectName + "'");
                 System.out.print("Project is Deleted!!!");
             } else
                 System.out.println("Project is not present!!!");
+            con.close();
         } catch (Exception e) {
             System.out.println(e);
         }
     }
 
+    public void approveWork() throws SQLException, IOException {
+        try {
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+            Connection con = db.getConnection();
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("select member.name , member.age,member.gender,member.email,memberWorks.wageComputation" +
+                    ",memberWorks.numberOfDays,memberWorks.projectName,project.totalMembers" +
+                    ",project.costEstimated,memberWorks.projectStatus from member INNER JOIN memberWorks" +
+                    " ON member.email = memberWorks.memail  INNER JOIN project  on project.projectName = memberWorks.projectName" +
+                    " where memberWorks.projectStatus= " +
+                    "'Not Active'");
+            while (rs.next())
+                System.out.println("Name: \n" + rs.getString(1) + "Age: \n" + rs.getInt(2) + "Gender: \n" + rs.getString(3) + "Email: \n" + rs.getString(4) + "Wage Computation: \n" + rs.getInt(5) +
+                        "Cost Estimation: \n" + rs.getInt(6) + "Project Status: \n" + rs.getString(7) + "------");
+
+                System.out.println("Enter Email of the member to approve his/her work:");
+                String email = bufferedReader.readLine();
+                if (vl.isValid(email)) {
+                    while (rs.next()) {
+                        if (email == rs.getString(4)) {
+                            stmt.executeUpdate("update memberWorks set projectStatus= 'Active' where email = '" + email + "'");
+                            System.out.println("Congratulation! It is Approved!!!...");
+                        }
+                    }
+                } else
+                    System.out.println("Email is Invalid!!!");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+
+    public void approveWages() throws SQLException {
+        try {
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+            Connection con = db.getConnection();
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("select member.name ,member.gender,member.email,memberWorks.wageComputation," +
+                    "memberWorks.projectName from member INNER JOIN memberWorks ON member.email = memberWorks.memail   where " +
+                    "memberWorks.wageStatus='Not Active'");
+            while (rs.next()) {
+                System.out.println("Name: \n" + rs.getString(1) + "Gender: \n" + rs.getString(2) + "Email: \n" + rs.getString(3) +
+                        "Wage Computation: \n" + rs.getInt(4) + "Project Name: \n" + rs.getString(5));
+            }
+            System.out.println("Enter Email of the member to approve his/her wage:");
+            String email = bufferedReader.readLine();
+            if (vl.isValid(email)) {
+                while (rs.next()) {
+                    if (email == rs.getString(4)) {
+                        stmt.executeUpdate("update memberWorks set wageStatus= 'Active' where email = '" + email + "'");
+                        System.out.println("Congratulation! It is Approved!!!...");
+                    }
+                }
+            } else
+                System.out.println("Email is Invalid!!!");
+            con.close();
+        }
+        catch (Exception e){
+            System.out.println(e);
+        }
+    }
+
+    public void notification() throws SQLException, IOException {
+        try {
+            System.out.println("Select ...\n 1. Approve Work\n 2. Approve Wages \n 3.Complains\n");
+            int i = sc.nextInt();
+            while (i <= 3) {
+                if (i == 1)
+                    approveWork();
+                else if (i == 2)
+                    approveWages();
+                else if (i == 3)
+                    viewComplaints();
+                else if (i == 4){
+                    System.out.println("Back to Main options");
+                    break;
+                }
+                System.out.println("Select ...\n 1. Approve Work\n 2. Approve Wages \n 3.Complains\n");
+                i = sc.nextInt();
+            }
+        }
+        catch (Exception e){
+            System.out.println(e);
+        }
+    }
 }
+
