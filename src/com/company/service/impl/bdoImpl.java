@@ -29,9 +29,9 @@ public class bdoImpl {
         try {
             Connection con = db.getConnection();
             Statement stmt = con.createStatement();
-            System.out.print("Choose your option \n 1.Create Gpm \n 2.Update Gpm \n " +
-                    "3.Delete Gpm \n 4.Create Project \n 5.Update Project \n 6.Delete Project\n" +
-                    "7.Show all the GPM \n 8.Show all the Member\n 9. Notifications \n 10. Exit\n");
+            System.out.print("\nChoose your option \n 1.Create Gpm \n 2.Update Gpm \n " +
+                    "3.Delete Gpm \n 4.Create Project \n 5.Update Project \n 6.Delete Project \n" +
+                    "7.Show all the GPM \n 8.Show all the Member \n 9. Notifications \n 10. Exit \n");
             int i = sc.nextInt();
             while (i <= 10) {
                 if (i == 1)
@@ -56,8 +56,8 @@ public class bdoImpl {
                     System.out.println("\t****Thanks for using 'Mahatma Gandhi National Rural Employment Act' system**** ");
                     break;
                 }
-                System.out.print("Choose your option \n 1.Create Gpm \n 2.Update Gpm \n " +
-                        "3.Delete Gpm \n 4.Create Project \n 5.Update Project \n 6.Delete Project\n" +
+                System.out.print("\nChoose your option \n 1.Create Gpm \n 2.Update Gpm \n " +
+                        "3.Delete Gpm \n 4.Create Project \n 5.Update Project \n 6.Delete Project \n" +
                         "7.Show all the GPM \n 8.Show all the Member\n 9. Notifications \n 10. Exit\n");                i = sc.nextInt();
             }
 
@@ -71,10 +71,9 @@ public class bdoImpl {
         try {
             Connection con = db.getConnection();
             Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("\"select member.email, member.name, report.issue from member INNER JOIN report ON member.mId = report.mId");
+            ResultSet rs = stmt.executeQuery("select member.email, member.name, report.issue from member INNER JOIN report ON member.mId = report.mId");
             while (rs.next())
-                System.out.print("Member Email:"+rs.getString(1) + "  \n" + "Member Name: "+rs.getString(2) + " \n " + "Issue: "+rs.getString(3)+"\n");
-//                System.out.println(rs.getString(2)+" "+rs.getString(3)+"  "+rs.getInt(4)+" "+rs.getFloat(5)+"  "+rs.getDate(6)+"  "+rs.getDate(7)+"   "+rs.getString(8));
+                System.out.print("Member Email: "+rs.getString(1) + "  \n" + "Member Name: "+rs.getString(2) + " \n " + "Issue: "+rs.getString(3)+"\n-----------------------");
             con.close();
         } catch (Exception e) {
             System.out.print(e);
@@ -87,7 +86,7 @@ public class bdoImpl {
             Statement stmt = con.createStatement();
             System.out.print("Enter your EmailId: ");
             String Email = sc.nextLine();
-            System.out.print("Enter your Password");
+            System.out.print("Enter your Password: ");
             String Password = sc.nextLine();
             if (vl.isValid(Email)) {
                 ResultSet rs = stmt.executeQuery("select * from user where email = '" + Email + "'  AND password = '" + Password + "' ");
@@ -330,21 +329,28 @@ public class bdoImpl {
                     " ON member.email = memberWorks.memail  INNER JOIN project  on project.projectName = memberWorks.projectName" +
                     " where memberWorks.projectStatus= " +
                     "'Not Active'");
-            while (rs.next())
-                System.out.println("Name: \n" + rs.getString(1) + "Age: \n" + rs.getInt(2) + "Gender: \n" + rs.getString(3) + "Email: \n" + rs.getString(4) + "Wage Computation: \n" + rs.getInt(5) +
-                        "Cost Estimation: \n" + rs.getInt(6) + "Project Status: \n" + rs.getString(7) + "------");
+            String[] emails = new String[100];
+            int i =0;
+            while (rs.next()) {
+                System.out.println("Name: " + rs.getString(1) + " \n" + "Age: " + rs.getInt(2) + " \n" + "Gender: " + rs.getString(3) + " \n" + "Email: " + rs.getString(4) + " \n" + "Wage Computation: " + rs.getInt(5) +
+                        " \n" + "Cost Estimation: " + rs.getInt(6) + " \n" + "Project Status: " + rs.getString(7) + "\n---------");
+                emails[i++]=rs.getString(4) ;
+            }
+
 
                 System.out.println("Enter Email of the member to approve his/her work:");
                 String email = bufferedReader.readLine();
                 if (vl.isValid(email)) {
-                    while (rs.next()) {
-                        if (email == rs.getString(4)) {
+                    for(int j = 0 ; j < i; j++) {
+                        if (email.equals(emails[j])) {
                             stmt.executeUpdate("update memberWorks set projectStatus= 'Active' where email = '" + email + "'");
                             System.out.println("Congratulation! It is Approved!!!...");
                         }
                     }
+
                 } else
-                    System.out.println("Email is Invalid!!!");
+                        System.out.println("Email is Invalid!!!");
+            con.close();
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -359,16 +365,19 @@ public class bdoImpl {
             ResultSet rs = stmt.executeQuery("select member.name ,member.gender,member.email,memberWorks.wageComputation," +
                     "memberWorks.projectName from member INNER JOIN memberWorks ON member.email = memberWorks.memail   where " +
                     "memberWorks.wageStatus='Not Active'");
+            String[] emails = new String[100];
+            int i =0;
             while (rs.next()) {
-                System.out.println("Name: \n" + rs.getString(1) + "Gender: \n" + rs.getString(2) + "Email: \n" + rs.getString(3) +
-                        "Wage Computation: \n" + rs.getInt(4) + "Project Name: \n" + rs.getString(5));
+                System.out.println("Name: " + rs.getString(1) +" \n"+ "Gender: " + rs.getString(2) +" \n"+ "Email: " + rs.getString(3) +
+                        " \n"+"Wage Computation: " + rs.getInt(4) +" \n"+ "Project Name: " + rs.getString(5)+"\n-------------------");
+                emails[i++]=rs.getString(3) ;
             }
-            System.out.println("Enter Email of the member to approve his/her wage:");
+            System.out.println("\nEnter Email of the member to approve his/her wage:");
             String email = bufferedReader.readLine();
             if (vl.isValid(email)) {
-                while (rs.next()) {
-                    if (email == rs.getString(4)) {
-                        stmt.executeUpdate("update memberWorks set wageStatus= 'Active' where email = '" + email + "'");
+                for(int j = 0 ; j < i; j++) {
+                    if(email.equals(emails[j])) {
+                        stmt.executeUpdate("update memberWorks set wageStatus= 'Active' where memail = '" + email + "'");
                         System.out.println("Congratulation! It is Approved!!!...");
                     }
                 }
@@ -383,7 +392,7 @@ public class bdoImpl {
 
     public void notification() throws SQLException, IOException {
         try {
-            System.out.println("Select ...\n 1. Approve Work\n 2. Approve Wages \n 3.Complains\n");
+            System.out.println("\nSelect ...\n 1. Approve Work\n 2. Approve Wages \n 3.Complains\n");
             int i = sc.nextInt();
             while (i <= 3) {
                 if (i == 1)
@@ -396,7 +405,7 @@ public class bdoImpl {
                     System.out.println("Back to Main options");
                     break;
                 }
-                System.out.println("Select ...\n 1. Approve Work\n 2. Approve Wages \n 3.Complains\n");
+                System.out.println("\nSelect ...\n 1. Approve Work\n 2. Approve Wages \n 3.Complains\n");
                 i = sc.nextInt();
             }
         }

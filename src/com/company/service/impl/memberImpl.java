@@ -40,7 +40,7 @@ public class memberImpl {
             Statement stmt = con.createStatement();
             System.out.print("Enter your EmailId: ");
             String Email = sc.nextLine();
-            System.out.print("Enter your Password");
+            System.out.print("Enter your Password: ");
             String Password = sc.nextLine();
             if (vl.isValid(Email)) {
                 ResultSet rs = stmt.executeQuery("select * from member where email = '" + Email + "'  AND password = '" + Password + "' ");
