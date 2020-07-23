@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
-public class bdoImpl {
+public class bdoImpl implements bdo{
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
     databaseConnection db = new databaseConnection();
     validator vl = new validator();

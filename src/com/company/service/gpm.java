@@ -10,6 +10,6 @@ public interface gpm {
     public void updateMember() throws SQLException;
     public void deleteMember() throws SQLException;
     public void issueJobCard() throws SQLException, IOException;
-    public void ProjectAllotmentMember() throws SQLException, IOException;
+    public void projectAllotmentMember() throws SQLException, IOException;
 
 }

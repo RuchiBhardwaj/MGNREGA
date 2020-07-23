@@ -1,6 +1,7 @@
 package com.company.service.impl;
 
 import com.company.repo.databaseConnection;
+import com.company.service.member;
 import com.company.utils.validator;
 
 import java.io.BufferedReader;
@@ -12,7 +13,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
 
-public class memberImpl {
+public class memberImpl implements member {
     databaseConnection db = new databaseConnection();
     validator vl = new validator();
     Scanner sc = new Scanner(System.in);

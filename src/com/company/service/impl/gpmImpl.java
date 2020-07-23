@@ -1,6 +1,7 @@
 package com.company.service.impl;
 
 import com.company.repo.databaseConnection;
+import com.company.service.gpm;
 import com.company.utils.validator;
 
 import java.io.BufferedReader;
@@ -13,7 +14,7 @@ import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.Scanner;
 
-public class gpmImpl {
+public class gpmImpl implements gpm{
     databaseConnection db = new databaseConnection();
     validator vl = new validator();
     Scanner sc = new Scanner(System.in);
