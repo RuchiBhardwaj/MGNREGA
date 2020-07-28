@@ -27,33 +27,39 @@ public class validator {
         return pat.matcher(email).matches();
     }
 
-    public void listOfProjects(Statement stmt) throws SQLException {
+    public boolean listOfProjects(Statement stmt) throws SQLException {
         try {
             ResultSet rs = stmt.executeQuery("select * from project where is_deleted = 'F'");
             while (rs.next())
                 System.out.println("Project Name: " + rs.getString(2)+ "\n "+"Address: " + rs.getString(3)+"\n "+"TotalMembers: " + rs.getInt(4)+"\n "+"Cost Estimation: " + rs.getFloat(5)+"\n "+"Start Date: " + rs.getDate(6)+"\n "+"End Date: " + rs.getDate(7)+"\n "+"Project Type: "+rs.getString(8)+"\n---------------");
+            return true;
         } catch (Exception e) {
             System.out.print(e);
+            return false;
         }
     }
 
-    public void listOfGpm(Statement stmt) throws SQLException {
+    public boolean listOfGpm(Statement stmt) throws SQLException {
         try {
             ResultSet rs = stmt.executeQuery("select * from gpm where is_deleted= 'F'");
             while (rs.next())
                 System.out.println("Email: " + rs.getString(2)+ "\n "+"Name: " + rs.getString(3)+"\n "+"Age: " + rs.getInt(4)+"\n "+"Address: " + rs.getString(5)+"\n "+"Pincode: " + rs.getInt(7)+"\n "+"Password: " + rs.getString(8)+"\n---------------");
+            return true;
         } catch (Exception e) {
             System.out.print(e);
+            return false;
         }
     }
-    public void listOfMember(Statement stmt) throws SQLException{
+    public boolean listOfMember(Statement stmt) throws SQLException{
         try {
             System.out.println("Here is all the list of Member.....");
             ResultSet rs = stmt.executeQuery("select * from member where is_deleted= 'F'");
             while (rs.next())
                 System.out.println("Email: " + rs.getString(2)+ "\n "+"Name: " + rs.getString(3)+"\n "+"Age: " + rs.getInt(4)+"\n "+"Address: " + rs.getString(6)+"\n "+"Pincode: " + rs.getInt(7)+"\n "+"Password: " + rs.getString(9)+"\n---------------");
+            return true;
         } catch (Exception e) {
             System.out.print(e);
+            return false;
         }
 
     }

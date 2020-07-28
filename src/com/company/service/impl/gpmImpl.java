@@ -21,20 +21,21 @@ public class gpmImpl implements gpm{
     int UID;
     public void gpmOption() throws SQLException, IOException {
         try {
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
             System.out.print("Choose your option \n 1.Create Member \n 2.Update Member \n 3.Delete Member" +
                     " \n 4. Project Allotment \n 5. Issue Job Card \n 6. Exit \n");
             int i = sc.nextInt();
             while (i <= 6) {
                 if (i == 1)
-                    createMember();
+                    createMember(bufferedReader);
                 else if (i == 2)
-                    updateMember();
+                    updateMember(bufferedReader);
                 else if (i == 3)
-                    deleteMember();
+                    deleteMember(bufferedReader);
                 else if (i == 4)
-                    projectAllotmentMember();
+                    projectAllotmentMember(bufferedReader);
                 else if (i == 5)
-                    issueJobCard();
+                    issueJobCard(bufferedReader);
                 else if(i == 6) {
                     System.out.println("\t****Thanks for using 'Mahatma Gandhi National Rural Employment Act' system**** ");
                     break;
@@ -74,9 +75,8 @@ public class gpmImpl implements gpm{
         }
     }
 
-    public void createMember() throws SQLException, IOException {
+    public void createMember(BufferedReader bufferedReader) throws SQLException, IOException {
         try {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
             Connection con = db.getConnection();
             Statement stmt = con.createStatement();
             int gpmId = this.UID;
@@ -84,13 +84,13 @@ public class gpmImpl implements gpm{
             System.out.println("Name: ");
             String name = bufferedReader.readLine();
             System.out.println("Age:  ");
-            int age = sc.nextInt();
+            int age = bufferedReader.read();
             System.out.println("Gender(M/F)");
             String gender = bufferedReader.readLine();
             System.out.println("Address");
             String address = bufferedReader.readLine();
             System.out.println("Pincode: ");
-            int pincode = sc.nextInt();
+            int pincode = bufferedReader.read();
             char is_deleted = 'F';
             System.out.println("Email: ");
             String email = bufferedReader.readLine();
@@ -109,9 +109,8 @@ public class gpmImpl implements gpm{
         }
     }
 
-    public void updateMember() throws SQLException{
+    public void updateMember(BufferedReader bufferedReader) throws SQLException{
         try {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
             Connection con = db.getConnection();
             Statement stmt = con.createStatement();
             vl.listOfMember(stmt);
@@ -127,7 +126,7 @@ public class gpmImpl implements gpm{
                     System.out.print("\n4.Pincode: " + rs.getInt(7));
                     System.out.print("\n5.Password:" + rs.getString(9));
                     System.out.print("\n You can only Update\n 1. Name 2.Address 3.Pincode 4.Password \n Which feild You want to Update");
-                    int ch = sc.nextInt();
+                    int ch = bufferedReader.read();
                     if (ch == 1) {
                         System.out.print("Please update your Name: ");
                         String name = bufferedReader.readLine();
@@ -135,20 +134,20 @@ public class gpmImpl implements gpm{
                         System.out.println("Updated!!!");
                     }else if (ch == 2) {
                         System.out.print("Please update your Address: ");
-                        String address = sc.nextLine();
-                        stmt.executeUpdate("Update member set name ='" + address + "' ,updated_at=CURRENT_TIMESTAMP where email = '" + email + "'");
+                        String address = bufferedReader.readLine();
+                        stmt.executeUpdate("Update member set address ='" + address + "' ,updated_at=CURRENT_TIMESTAMP where email = '" + email + "'");
                         System.out.println("Updated!!!");
                     }else if (ch == 3) {
                         System.out.print("Update your Pincode: ");
-                        int pincode = sc.nextInt();
-                        stmt.executeUpdate("Update member set name ='" + pincode + "' ,updated_at=CURRENT_TIMESTAMP where email = '" + email + "'");
+                        int pincode = bufferedReader.read();
+                        stmt.executeUpdate("Update member set pin ='" + pincode + "' ,updated_at=CURRENT_TIMESTAMP where email = '" + email + "'");
                         System.out.println("Updated!!!");
                     }else if (ch == 4) {
                         System.out.print("Update your Password:");
-                        String password = sc.nextLine();
-                        stmt.executeUpdate("Update member set name ='" + password + "' ,updated_at=CURRENT_TIMESTAMP where email = '" + email + "'");
+                        String password = bufferedReader.readLine();
+                        stmt.executeUpdate("Update member set password ='" + password + "' ,updated_at=CURRENT_TIMESTAMP where email = '" + email + "'");
                         System.out.println("Updated!!!");
-                    }if (ch > 4)
+                    }else if (ch > 4)
                         System.out.print("Invalid Choice");
                 } else
                     System.out.print("this email is not present");
@@ -159,13 +158,13 @@ public class gpmImpl implements gpm{
             System.out.print(e);
         }
     }
-    public void deleteMember() throws SQLException{
+    public void deleteMember(BufferedReader bufferedReader) throws SQLException{
         try {
             Connection con = db.getConnection();
             Statement stmt = con.createStatement();
             vl.listOfMember(stmt);
             System.out.print("Enter EmailId to delete the user: ");
-            String email = sc.nextLine();
+            String email = bufferedReader.readLine();
             if (vl.isValid(email)) {
                 stmt.executeUpdate("update member set is_deleted = 'T' where email = '"+email+"'");
                 System.out.print("User is Deleted!!!");
@@ -177,9 +176,8 @@ public class gpmImpl implements gpm{
         }
     }
 
-    public void issueJobCard() throws SQLException, IOException {
+    public void issueJobCard(BufferedReader bufferedReader) throws SQLException, IOException {
         try {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
             Connection con = db.getConnection();
             Statement stmt = con.createStatement();
             System.out.println("Issue Admit card..");
@@ -205,9 +203,8 @@ public class gpmImpl implements gpm{
             System.out.println(e);
         }
     }
-    public void projectAllotmentMember() throws SQLException, IOException {
+    public void projectAllotmentMember(BufferedReader bufferedReader) throws SQLException, IOException {
         try {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
             Connection con = db.getConnection();
             Statement stmt = con.createStatement();
             System.out.println("Allotment of Project to Member!!!... ");
@@ -218,7 +215,7 @@ public class gpmImpl implements gpm{
                 ResultSet rs = stmt.executeQuery("select * from member where email= '" + email + "'");
                 if (rs.next()) {
                     System.out.println("NumberOfDays: ");
-                    int noOfDays = sc.nextInt();
+                    int noOfDays = bufferedReader.read();
                     int wage = noOfDays * 100;
                     System.out.println("Project Name:");
                     String projectName = bufferedReader.readLine();

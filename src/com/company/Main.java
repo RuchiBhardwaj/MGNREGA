@@ -5,6 +5,8 @@ import com.company.service.impl.gpmImpl;
 import com.company.service.impl.memberImpl;
 import com.sun.org.apache.xml.internal.resolver.readers.ExtendedXMLCatalogReader;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Scanner;
@@ -14,6 +16,7 @@ public class Main {
     public static void main(String[] args) throws SQLException, ParseException {
 	// write your code here
         try {
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
             bdoImpl bdo = new bdoImpl();
             gpmImpl gpm = new gpmImpl();
             memberImpl member = new memberImpl();
@@ -22,11 +25,11 @@ public class Main {
             int i = sc.nextInt();
             while (i <= 4) {
                 if (i == 1)
-                    bdo.bdoLogin();
+                    bdo.bdoLogin(bufferedReader);
                 else if (i == 2)
                     gpm.gpmLogin();
                 else if (i == 3)
-                    member.memberLogin();
+                    member.memberLogin(bufferedReader);
                 else if (i ==4){
                     System.out.println("Thank you!!!");
                     break;

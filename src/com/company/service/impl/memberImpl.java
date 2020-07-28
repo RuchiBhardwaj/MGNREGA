@@ -18,31 +18,35 @@ public class memberImpl implements member {
     validator vl = new validator();
     Scanner sc = new Scanner(System.in);
     int UID;
-    public void memberOption() throws SQLException, IOException {
+
+    public boolean memberOption() throws SQLException, IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+
         System.out.print("Choose your option \n 1.See your Profile \n 2.file your complain \n 3.Exit \n");
         int i=sc.nextInt();
-       while(i<=3){
-           if(i==1)
+       while(i<=3) {
+           if (i == 1)
                memberDetails();
-           else if(i==2)
-               fileComplain();
-           else if(i == 3) {
+           else if (i == 2)
+               fileComplain(bufferedReader);
+           else if (i == 3) {
                System.out.println("\t****Thanks for using 'Mahatma Gandhi National Rural Employment Act' system**** ");
                break;
            }
            System.out.print("Choose your option \n 1.See your Profile \n 2.file your complain \n 3.Exit \n");
            i = sc.nextInt();
-
+           return true;
        }
+       return true;
     }
-    public void memberLogin() throws SQLException {
+    public void memberLogin(BufferedReader bufferedReader) throws SQLException {
         try {
             Connection con = db.getConnection();
             Statement stmt = con.createStatement();
             System.out.print("Enter your EmailId: ");
-            String Email = sc.nextLine();
+            String Email = bufferedReader.readLine();
             System.out.print("Enter your Password: ");
-            String Password = sc.nextLine();
+            String Password = bufferedReader.readLine();
             if (vl.isValid(Email)) {
                 ResultSet rs = stmt.executeQuery("select * from member where email = '" + Email + "'  AND password = '" + Password + "' ");
                 if (rs.next()) {
@@ -90,10 +94,9 @@ public class memberImpl implements member {
             System.out.println(e);
         }
     }
-    public void fileComplain() throws SQLException, IOException {
+    public void fileComplain(BufferedReader bufferedReader) throws SQLException, IOException {
         try {
             Connection con = db.getConnection();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
             Statement stmt = con.createStatement();
             System.out.println("File your Complain here !!!...");
             int mid = this.UID;
